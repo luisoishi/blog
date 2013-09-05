@@ -105,14 +105,15 @@ def teste():
 
 #print sys.argv, __name__
 if __name__ == '__main__':
-    if sys.argv[1] == '-i':
+    operacao = sys.argv[1]
+    if operacao == '-i':
         insert()
-    elif sys.argv[1] == '-l':
+    elif operacao == '-l':
         listar()
-    elif sys.argv[1] == '-c':
+    elif operacao == '-c':
         cadastrar()
-    elif sys.argv[1] == '-t':
+    elif operacao == '-t':
         teste()
-    elif sys.argv[1] == '-s':
+    elif operacao == '-s':
         schema()    else:
-	print sys.argv[1]," isnt a invalid argument"
+	print operacao," isnt a invalid argument"
