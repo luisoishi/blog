@@ -3,14 +3,15 @@ from datetime import date
 import pickle
 import hashlib
 import getpass
+import psycopg2
 
 def schema():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS login CASCADE")
     cur.execute("CREATE TABLE login (user_id serial PRIMARY KEY,"
-                                     "username varchar(30) UNIQUE,"
-                                     "password varchar(20))")
+                                     "username varchar(40) UNIQUE,"
+                                     "password varchar(35))")
     cur.execute("DROP TABLE IF EXISTS post CASCADE")
     cur.execute("CREATE TABLE post (post_id serial,"
                                     "user_id int references login(user_id),"
@@ -22,15 +23,18 @@ def schema():
     conn.close()
 
 def cadastrar():
+    print "===============Register mode==============="
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     autenticado = 0
     login = raw_input("Username: ")
-    senha = getpass.getpass("Password: ")
+    password = getpass.getpass("Password: ")
     password_check = getpass.getpass("Insert the password again: ")
-    if senha == password_check:
+    encrypted_password = hashlib.md5( password ).hexdigest()
+    if password == password_check:
         try:
-            cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",(login, senha))
+            cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",
+                        (login, encrypted_password))
         except psycopg2.IntegrityError:
             print "Username" ,login, "already in use"
     else:
@@ -115,5 +119,6 @@ if __name__ == '__main__':
     elif operacao == '-t':
         teste()
     elif operacao == '-s':
-        schema()    else:
-	print operacao," isnt a invalid argument"
+        schema()
+    else:
+	    print operacao," isnt a invalid argument"
