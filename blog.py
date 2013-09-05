@@ -61,25 +61,23 @@ def listar():
         arquivo.close()
 
 def cadastrar():
-    username = raw_input("Insert user name: ")
-    password = getpass.getpass("Password:")
+       conn = psycopg2.connect("dbname=teste user=luis")
+    cur = conn.cursor()
+    autenticado = 0
+    login = raw_input("Username: ")
+    senha = getpass.getpass("Password: ")
     password_check = getpass.getpass("Insert the password again: ")
-    user = {"username": username, "password":password}
-    if password == password_check:
-        #When user.txt is empty
-        with open('user.txt', 'r') as user_file:
-            try:
-                lista = pickle.load(user_file)
-            except EOFError:
-                lista = []
-        with open('user.txt', 'w') as user_file:
-            sign_up = {'username': username, 'password': password}
-            lista.append(sign_up)
-            pickle.dump(lista, user_file)
-            print "User created sucessfully"
+    if senha == password_check:
+        try:
+            cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",(login, senha))
+        except psycopg2.IntegrityError:
+            print "Username" ,login, "already in use"
     else:
-        print "passwords dont match"
-
+        print "password didnt match"
+    conn.commit()
+    cur.close()
+    conn.close()
+    
 def teste():
     teste = getpass.getpass("Password")
     teste2 = getpass.getpass("password check")
