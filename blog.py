@@ -4,6 +4,41 @@ import pickle
 import hashlib
 import getpass
 
+def schema():
+    conn = psycopg2.connect("dbname=blog user=luis")
+    cur = conn.cursor()
+    cur.execute("DROP TABLE IF EXISTS login CASCADE")
+    cur.execute("CREATE TABLE login (user_id serial PRIMARY KEY,"
+                                     "username varchar(30) UNIQUE,"
+                                     "password varchar(20))")
+    cur.execute("DROP TABLE IF EXISTS post CASCADE")
+    cur.execute("CREATE TABLE post (post_id serial,"
+                                    "user_id int references login(user_id),"
+                                    "header varchar(30),"
+                                    "texto text )")
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def cadastrar():
+    conn = psycopg2.connect("dbname=blog user=luis")
+    cur = conn.cursor()
+    autenticado = 0
+    login = raw_input("Username: ")
+    senha = getpass.getpass("Password: ")
+    password_check = getpass.getpass("Insert the password again: ")
+    if senha == password_check:
+        try:
+            cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",(login, senha))
+        except psycopg2.IntegrityError:
+            print "Username" ,login, "already in use"
+    else:
+        print "password didnt match"
+    conn.commit()
+    cur.close()
+    conn.close()
+
 def insert():
     print "==========Insertion mode=========="
     print
@@ -60,23 +95,7 @@ def listar():
             print "Empty file!"
         arquivo.close()
 
-def cadastrar():
-       conn = psycopg2.connect("dbname=teste user=luis")
-    cur = conn.cursor()
-    autenticado = 0
-    login = raw_input("Username: ")
-    senha = getpass.getpass("Password: ")
-    password_check = getpass.getpass("Insert the password again: ")
-    if senha == password_check:
-        try:
-            cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",(login, senha))
-        except psycopg2.IntegrityError:
-            print "Username" ,login, "already in use"
-    else:
-        print "password didnt match"
-    conn.commit()
-    cur.close()
-    conn.close()
+
     
 def teste():
     teste = getpass.getpass("Password")
