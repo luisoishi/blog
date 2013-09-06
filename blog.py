@@ -16,7 +16,11 @@ def schema():
     cur.execute("CREATE TABLE post (post_id serial,"
                                     "user_id int references login(user_id),"
                                     "header varchar(30),"
-                                    "texto text )")
+                                    "day date)")
+    cur.execute("DROP TABLE IF EXISTS texto CASCADE")
+    cur.execute("CREATE TABLE texto (texto_id serial,"
+                                     "user_id int references login(user_id),"
+                                     "texto_conteudo text )")
 
     conn.commit()
     cur.close()
@@ -44,69 +48,55 @@ def cadastrar():
     conn.close()
 
 def insert():
-    print "==========Insertion mode=========="
-    print
-    login = raw_input("username: ")
-    senha = getpass.getpass("password: ")
+    print "===============Login==============="
+    login = raw_input("Username: ")
+    password = getpass.getpass("Password: ")
+    encrypted_password = hashlib.md5(password).hexdigest()
+    conn = psycopg2.connect("dbname=blog user=luis")
+    cur = conn.cursor()
     autenticado = 0
-    with open('user.txt', 'r') as user_file:
-        try:
-            lista = pickle.load(user_file)
-        #When user.txt is empty
-        except EOFError:
-            lista = []
-
-        for user in lista:
-            if user['username'] == login:
-                autenticado = 1
+    cur.execute("SELECT user_id,username,password FROM login where username = %s",
+                (login,))
+    row = cur.fetchone()
+    if row != None and login == row[1] and encrypted_password == row[2]:
+        user_id =row[0]
+        autenticado = 1
+    else:
+        print "Username and/or Password invalid"
 
     if autenticado == 1:
-    	print "Welcome",  login
+        print "==========Insertion mode=========="
+        print "Welcome", login
         title = raw_input("Header: ")
         text = raw_input("Post: ")
         dia = unicode(date.today())
-        post = {"data": dia, "title": title, "text":text, "user":login}
-        #when dados.txt is empty
-        with open('dados.txt', 'r') as arquivo:
-            try:
-                lista = pickle.load(arquivo)
-            except EOFError:
-                lista = []
-			
-        with open('dados.txt', 'w') as arquivo:
-            lista.append(post)
-            pickle.dump(lista, arquivo)
-            arquivo.close()
+        cur.execute("INSERT INTO post(user_id,header,day) VALUES (%s,%s,%s)",
+                    (user_id,title,dia))
+        cur.execute("INSERT INTO texto(user_id,texto_conteudo) VALUES(%s,%s)",
+                    (user_id,text))
 
-    else:
-        print "login and/or password invalid"
+    conn.commit()
+    cur.close()
+    conn.close()
 
-    user_file.close()
-    
 def listar():
-    print "==========List Mode==========\n"
-    post = []
-    with open('dados.txt', 'r') as arquivo:
-        try:
-            lista = pickle.load(arquivo)
-            for post in lista:
-                print
-                print post["title"], "opened at",post["data"], "as", post["user"]
-                print "-------------------------------------"
-                print post["text"]
-                print "====================================="
-        except EOFError:
-            print "Empty file!"
-        arquivo.close()
 
-
-    
 def teste():
-    teste = getpass.getpass("Password")
-    teste2 = getpass.getpass("password check")
-    if teste == teste2:
-        print "igual"
+    conn = psycopg2.connect("dbname=blog user=luis")
+    cur = conn.cursor()
+    cur.execute("SELECT header,day,username,texto_conteudo FROM login,post,texto")
+    for row in cur.fetchall():
+        print "============================================================"
+        print "Title: ",row[0]
+        print "Opened at: ", row[1]
+        print "Owner: ",row[2]
+        print "------------------------------------------------------------"
+        print row[3]
+        print "============================================================"
 
+    conn.commit()
+    cur.close()
+    conn.close()
 #print sys.argv, __name__
 if __name__ == '__main__':
     operacao = sys.argv[1]
