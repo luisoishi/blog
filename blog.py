@@ -9,15 +9,16 @@ def schema():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS login CASCADE")
+    cur.execute("DROP TABLE IF EXISTS post CASCADE")
+    cur.execute("DROP TABLE IF EXISTS texto CASCADE")
+
     cur.execute("CREATE TABLE login (user_id serial PRIMARY KEY,"
                                      "username varchar(40) UNIQUE,"
                                      "password varchar(35))")
-    cur.execute("DROP TABLE IF EXISTS post CASCADE")
     cur.execute("CREATE TABLE post (post_id serial,"
                                     "user_id int references login(user_id),"
                                     "header varchar(30) PRIMARY KEY,"
                                     "day date )")
-    cur.execute("DROP TABLE IF EXISTS texto CASCADE")
     cur.execute("CREATE TABLE texto (texto_id serial,"
                                      "header varchar(30) references post(header),"
                                      "conteudo text )")
@@ -101,9 +102,14 @@ def listar():
     conn.close()
 
 def teste():
+    username = raw_input("Username: ")
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
-    cur.execute("SELECT header,day,username,conteudo FROM login,post,texto")
+    cur.execute("SELECT post.header,day,username, conteudo "
+                "FROM login, post, texto "
+                "WHERE post.user_id = login.user_id AND "
+                "texto.header = post.header AND "
+                "username = %s", (username,))
     for row in cur.fetchall():
         print "============================================================"
         print "Title:",row[0]
