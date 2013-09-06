@@ -15,26 +15,25 @@ def schema():
     cur.execute("DROP TABLE IF EXISTS post CASCADE")
     cur.execute("CREATE TABLE post (post_id serial,"
                                     "user_id int references login(user_id),"
-                                    "header varchar(30),"
-                                    "day date)")
+                                    "header varchar(30) PRIMARY KEY,"
+                                    "day date )")
     cur.execute("DROP TABLE IF EXISTS texto CASCADE")
     cur.execute("CREATE TABLE texto (texto_id serial,"
-                                     "user_id int references login(user_id),"
-                                     "texto_conteudo text )")
+                                     "header varchar(30) references post(header),"
+                                     "conteudo text )")
 
     conn.commit()
     cur.close()
     conn.close()
 
 def cadastrar():
-    print "===============Register mode==============="
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     autenticado = 0
     login = raw_input("Username: ")
     password = getpass.getpass("Password: ")
     password_check = getpass.getpass("Insert the password again: ")
-    encrypted_password = hashlib.md5( password ).hexdigest()
+    encrypted_password = hashlib.md5(password).hexdigest()
     if password == password_check:
         try:
             cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",
@@ -43,6 +42,7 @@ def cadastrar():
             print "Username" ,login, "already in use"
     else:
         print "password didnt match"
+
     conn.commit()
     cur.close()
     conn.close()
@@ -72,14 +72,32 @@ def insert():
         dia = unicode(date.today())
         cur.execute("INSERT INTO post(user_id,header,day) VALUES (%s,%s,%s)",
                     (user_id,title,dia))
-        cur.execute("INSERT INTO texto(user_id,texto_conteudo) VALUES(%s,%s)",
-                    (user_id,text))
+        cur.execute("INSERT INTO texto(header, conteudo) VALUES(%s,%s)",
+                    (title,text))
 
     conn.commit()
     cur.close()
     conn.close()
 
 def listar():
+    conn = psycopg2.connect("dbname=blog user=luis")
+    cur = conn.cursor()
+    cur.execute("select post.header,day,username, conteudo "
+                "FROM login, post, texto "
+                "WHERE post.user_id = login.user_id AND "
+                "texto.header = post.header")
+    for row in cur.fetchall():
+        print "============================================================"
+        print "Title:",row[0]
+        print "Opened at:", row[1]
+        print "Owner:",row[2]
+        print "------------------------------------------------------------"
+        print row[3]
+        print "============================================================"
+
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def teste():
     conn = psycopg2.connect("dbname=blog user=luis")
@@ -87,9 +105,9 @@ def teste():
     cur.execute("SELECT header,day,username,texto_conteudo FROM login,post,texto")
     for row in cur.fetchall():
         print "============================================================"
-        print "Title: ",row[0]
-        print "Opened at: ", row[1]
-        print "Owner: ",row[2]
+        print "Title:",row[0]
+        print "Opened at:", row[1]
+        print "Owner:",row[2]
         print "------------------------------------------------------------"
         print row[3]
         print "============================================================"
