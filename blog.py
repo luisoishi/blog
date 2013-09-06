@@ -30,6 +30,7 @@ def cadastrar():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     autenticado = 0
+    print "===============Register==============="
     login = raw_input("Username: ")
     password = getpass.getpass("Password: ")
     password_check = getpass.getpass("Insert the password again: ")
@@ -82,7 +83,7 @@ def insert():
 def listar():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
-    cur.execute("select post.header,day,username, conteudo "
+    cur.execute("SELECT post.header,day,username, conteudo "
                 "FROM login, post, texto "
                 "WHERE post.user_id = login.user_id AND "
                 "texto.header = post.header")
@@ -102,7 +103,7 @@ def listar():
 def teste():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
-    cur.execute("SELECT header,day,username,texto_conteudo FROM login,post,texto")
+    cur.execute("SELECT header,day,username,conteudo FROM login,post,texto")
     for row in cur.fetchall():
         print "============================================================"
         print "Title:",row[0]
@@ -118,12 +119,12 @@ def teste():
 #print sys.argv, __name__
 if __name__ == '__main__':
     operacao = sys.argv[1]
-    if operacao == '-i':
+    if operacao == '-c':
+        cadastrar()
+    elif operacao == '-i':
         insert()
     elif operacao == '-l':
         listar()
-    elif operacao == '-c':
-        cadastrar()
     elif operacao == '-t':
         teste()
     elif operacao == '-s':
