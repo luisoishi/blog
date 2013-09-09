@@ -50,6 +50,42 @@ def cadastrar():
     cur.close()
     conn.close()
 
+def example():
+    conn = psycopg2.connect("dbname=teste user=luis")
+    cur = conn.cursor()
+    dia = unicode(date.today())
+    cur.execute("INSERT INTO login (username, password)"
+                "VALUES ('luisoishi','3858f62230ac3c915f300c664312c63f')")
+    cur.execute("INSERT INTO login (username, password)"
+                "VALUES ('luis','acbd18db4cc2f85cedef654fccc4a4d8')")
+    cur.execute("INSERT INTO login (username, password)"
+                "VALUES ('oishi','37b51d194a7513e45b56f6524f2d51f2')")
+    cur.execute("INSERT INTO post (user_id, header, day)"
+                "VALUES (1, 'h1', %s)",(dia,))
+    cur.execute("INSERT INTO post (user_id, header, day)"
+                "VALUES (2, 'h2', %s)",(dia,))
+    cur.execute("INSERT INTO post (user_id, header, day)"
+                "VALUES (3, 'h3', %s)", (dia,))
+    cur.execute("INSERT INTO post (user_id, header, day)"
+                "VALUES (2, 'h4', %s)", (dia,))
+    cur.execute("INSERT INTO post (user_id, header, day)"
+                "VALUES (1, 'h5', %s)", (dia,))
+    cur.execute("INSERT INTO texto (post_id, conteudo)"
+                "VALUES (1, 't1')")
+    cur.execute("INSERT INTO texto (post_id, conteudo)"
+                "VALUES (2, 't2')")
+    cur.execute("INSERT INTO texto (post_id, conteudo)"
+                "VALUES (3, 't3')")
+    cur.execute("INSERT INTO texto (post_id, conteudo)"
+                "VALUES (4, 't4')")
+    cur.execute("INSERT INTO texto (post_id, conteudo)"
+                "VALUES (5, 't5')")
+    
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
 def insert():
     print "===============Login==============="
     login = raw_input("Username: ")
@@ -131,6 +167,8 @@ if __name__ == '__main__':
     operacao = sys.argv[1]
     if operacao == '-c':
         cadastrar()
+    elif operacao == '-e':
+        example()
     elif operacao == '-i':
         insert()
     elif operacao == '-l':
