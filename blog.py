@@ -75,8 +75,11 @@ def insert():
         dia = unicode(date.today())
         cur.execute("INSERT INTO post(user_id,header,day) VALUES (%s,%s,%s)",
                     (user_id,title,dia))
+        cur.execute("SELECT post_id FROM post WHERE header = %s",(title,))
+        row = cur.fetchone()
+        post_id = row[0]
         cur.execute("INSERT INTO texto(header, conteudo) VALUES(%s,%s)",
-                    (title,text))
+                    (post_id,text))
 
     conn.commit()
     cur.close()
