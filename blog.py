@@ -15,17 +15,18 @@ def schema():
     cur.execute("CREATE TABLE login (user_id serial PRIMARY KEY,"
                                      "username varchar(40) UNIQUE,"
                                      "password varchar(35))")
-    cur.execute("CREATE TABLE post (post_id serial,"
+    cur.execute("CREATE TABLE post (post_id serial PRIMARY KEY,"
                                     "user_id int references login(user_id),"
-                                    "header varchar(30) PRIMARY KEY,"
+                                    "header varchar(30) UNIQUE,"
                                     "day date )")
     cur.execute("CREATE TABLE texto (texto_id serial,"
-                                     "header varchar(30) references post(header),"
+                                     "post_id int references post(post_id),"
                                      "conteudo text )")
 
     conn.commit()
     cur.close()
     conn.close()
+
 
 def cadastrar():
     conn = psycopg2.connect("dbname=blog user=luis")
@@ -57,7 +58,7 @@ def insert():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     autenticado = 0
-    cur.execute("SELECT user_id,username,password FROM login where username = %s",
+    cur.execute("SELECT user_id,username,password FROM login WHERE username = %s",
                 (login,))
     row = cur.fetchone()
     if row != None and login == row[1] and encrypted_password == row[2]:
