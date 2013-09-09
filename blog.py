@@ -28,6 +28,7 @@ def schema():
     conn.close()
 
 
+
 def cadastrar():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
@@ -51,7 +52,7 @@ def cadastrar():
     conn.close()
 
 def example():
-    conn = psycopg2.connect("dbname=teste user=luis")
+    conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     dia = unicode(date.today())
     cur.execute("INSERT INTO login (username, password)"
@@ -122,12 +123,12 @@ def insert():
     conn.close()
 
 def listar():
-    conn = psycopg2.connect("dbname=blog user=luis")
+    conn = psycopg2.connect("dbname=teste user=luis")
     cur = conn.cursor()
-    cur.execute("SELECT post.header,day,username, conteudo "
+    cur.execute("select header,day,username, conteudo "
                 "FROM login, post, texto "
-                "WHERE post.user_id = login.user_id AND "
-                "texto.header = post.header")
+                "WHERE login.user_id = post.user_id AND "
+                "post.post_id = texto.post_id")
     for row in cur.fetchall():
         print "============================================================"
         print "Title:",row[0]
