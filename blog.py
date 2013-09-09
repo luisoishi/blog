@@ -115,7 +115,7 @@ def insert():
         cur.execute("SELECT post_id FROM post WHERE header = %s",(title,))
         row = cur.fetchone()
         post_id = row[0]
-        cur.execute("INSERT INTO texto(header, conteudo) VALUES(%s,%s)",
+        cur.execute("INSERT INTO texto(post_id, conteudo) VALUES(%s,%s)",
                     (post_id,text))
 
     conn.commit()
@@ -123,7 +123,7 @@ def insert():
     conn.close()
 
 def listar():
-    conn = psycopg2.connect("dbname=teste user=luis")
+    conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
     cur.execute("select header,day,username, conteudo "
                 "FROM login, post, texto "
