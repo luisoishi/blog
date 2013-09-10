@@ -8,13 +8,16 @@ import psycopg2
 
 class Person(object):
     __storm_table__ = "login"
-    id = Int(primary=True)
-    name = unicode()
+    user_id = Int(primary=True)
+    username = unicode()
+    password = unicode()
 
 class Post(object):
     __storm_table__ = "post"
-    id = Int(primary=True)
-
+    post_id = Int(primary=True)
+    user_id = Int
+    header = unicode()
+    password = unicode()
 
 def schema():
     
