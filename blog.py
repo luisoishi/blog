@@ -18,19 +18,20 @@ def cadastrar():
         try:
             cur.execute("INSERT INTO login (username,password) VALUES(%s, %s)",
                         (login, encrypted_password))
+            conn.commit()
         except psycopg2.IntegrityError:
             print "Username" ,login, "already in use"
+            return
     else:
         print "password didnt match"
 
-    conn.commit()
     cur.close()
     conn.close()
 
 def example():
     conn = psycopg2.connect("dbname=blog user=luis")
     cur = conn.cursor()
-    dia = unicode(date.today())
+
     cur.execute("INSERT INTO login (username, password)"
                 "VALUES ('luisoishi','3858f62230ac3c915f300c664312c63f')")
     cur.execute("INSERT INTO login (username, password)"
@@ -38,15 +39,15 @@ def example():
     cur.execute("INSERT INTO login (username, password)"
                 "VALUES ('oishi','37b51d194a7513e45b56f6524f2d51f2')")
     cur.execute("INSERT INTO post (user_id, header, day)"
-                "VALUES (1, 'h1', %s)",(dia,))
+                "VALUES (1, 'h1', now())")
     cur.execute("INSERT INTO post (user_id, header, day)"
-                "VALUES (2, 'h2', %s)",(dia,))
+                "VALUES (2, 'h2', now())")
     cur.execute("INSERT INTO post (user_id, header, day)"
-                "VALUES (3, 'h3', %s)", (dia,))
+                "VALUES (3, 'h3', now())")
     cur.execute("INSERT INTO post (user_id, header, day)"
-                "VALUES (2, 'h4', %s)", (dia,))
+                "VALUES (2, 'h4', now())")
     cur.execute("INSERT INTO post (user_id, header, day)"
-                "VALUES (1, 'h5', %s)", (dia,))
+                "VALUES (1, 'h5', now())")
     cur.execute("INSERT INTO texto (post_id, conteudo)"
                 "VALUES (1, 't1')")
     cur.execute("INSERT INTO texto (post_id, conteudo)"
@@ -86,14 +87,19 @@ def insert():
         title = raw_input("Header: ")
         text = raw_input("Post: ")
         dia = unicode(date.today())
-        cur.execute("INSERT INTO post(user_id,header,day) VALUES (%s,%s,%s)",
-                    (user_id,title,dia))
+        try:
+            cur.execute("INSERT INTO post(user_id,header,day) VALUES (%s,%s,%s)",
+                        (user_id,title,dia))
+            conn.commit()
+        except psycopg2.IntegrityError:
+            print "Title", title,"already in use"
+            return
+
         cur.execute("SELECT post_id FROM post WHERE header = %s",(title,))
         row = cur.fetchone()
         post_id = row[0]
         cur.execute("INSERT INTO texto(post_id, conteudo) VALUES(%s,%s)",
                     (post_id,text))
-
     conn.commit()
     cur.close()
     conn.close()
