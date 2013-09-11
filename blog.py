@@ -6,8 +6,6 @@ import sys
 import psycopg2
 
 def cadastrar():
-    conn = psycopg2.connect("dbname=blog user=luis")
-    cur = conn.cursor()
     autenticado = 0
     print "===============Register==============="
     login = raw_input("Username: ")
@@ -29,9 +27,6 @@ def cadastrar():
     conn.close()
 
 def example():
-    conn = psycopg2.connect("dbname=blog user=luis")
-    cur = conn.cursor()
-
     cur.execute("INSERT INTO login (username, password)"
                 "VALUES ('luisoishi','3858f62230ac3c915f300c664312c63f')")
     cur.execute("INSERT INTO login (username, password)"
@@ -69,8 +64,6 @@ def insert():
     login = raw_input("Username: ")
     password = getpass.getpass("Password: ")
     encrypted_password = hashlib.md5(password).hexdigest()
-    conn = psycopg2.connect("dbname=blog user=luis")
-    cur = conn.cursor()
     autenticado = 0
     cur.execute("SELECT user_id,username,password FROM login WHERE username = %s",
                 (login,))
@@ -105,8 +98,6 @@ def insert():
     conn.close()
 
 def listar():
-    conn = psycopg2.connect("dbname=blog user=luis")
-    cur = conn.cursor()
     cur.execute("select header,day,username, conteudo "
                 "FROM login, post, texto "
                 "WHERE login.user_id = post.user_id AND "
@@ -125,8 +116,6 @@ def listar():
     conn.close()
 
 def schema():
-    conn = psycopg2.connect("dbname=blog user=luis")
-    cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS login CASCADE")
     cur.execute("DROP TABLE IF EXISTS post CASCADE")
     cur.execute("DROP TABLE IF EXISTS texto CASCADE")
@@ -149,8 +138,6 @@ def schema():
 
 def teste():
     username = raw_input("Username: ")
-    conn = psycopg2.connect("dbname=blog user=luis")
-    cur = conn.cursor()
     cur.execute("SELECT post.header, day, username, conteudo "
                 "FROM login, post, texto "
                 "WHERE post.user_id = login.user_id AND "
@@ -171,6 +158,8 @@ def teste():
 #print sys.argv, __name__
 if __name__ == '__main__':
     operacao = sys.argv[1]
+    conn = psycopg2.connect("dbname=luis_blog user=luisoishi")
+    cur = conn.cursor()
     if operacao == '-c':
         cadastrar()
     elif operacao == '-e':
