@@ -8,7 +8,7 @@ import psycopg2
 
 class Person(object):
     __storm_table__ = "login"
-    user_id = Int(primary=True)
+    id = Int(primary=True)
     username = unicode()
     password = unicode()
 
@@ -25,11 +25,11 @@ def schema():
     store.execute("DROP TABLE IF EXISTS post CASCADE")
     store.execute("DROP TABLE IF EXISTS texto CASCADE")
 
-    store.execute("CREATE TABLE login (user_id serial PRIMARY KEY,"
+    store.execute("CREATE TABLE login (id serial PRIMARY KEY,"
                                        "username VARCHAR UNIQUE,"
                                        "password VARCHAR)", noresult=True)
     store.execute("CREATE TABLE post (post_id serial PRIMARY KEY,"
-                                      "user_id INT References login(user_id),"
+                                      "user_id INT References login(id),"
                                       "header VARCHAR UNIQUE,"
                                       "day DATE)", noresult=True)
     store.execute("CREATE TABLE texto (text_id serial PRIMARY KEY,"
@@ -45,7 +45,8 @@ def cadastrar():
     encrypted_password = hashlib.md5(password).hexdigest()
     person.name = login
     person.password = encrypted_password
-    print person.name, person.password
+    store.add(person)
+    store.commit()
 
 #print sys.argv, __name__
 if __name__ == '__main__':
@@ -66,4 +67,3 @@ if __name__ == '__main__':
         schema()
     else:
 	    print operacao," isnt a invalid argument"
-    
