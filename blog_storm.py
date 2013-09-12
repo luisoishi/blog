@@ -121,6 +121,7 @@ def schema():
 #print sys.argv, __name__
 if __name__ == '__main__':
     operacao = sys.argv[1]
+    #"postgres://luisoishi@anthem/stoq_luis_teste" para usar no pc do escritorio
     database = create_database("postgres://luis@localhost/stoq_luis_teste")
     store = Store(database)
     if operacao == '-c':
