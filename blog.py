@@ -65,8 +65,8 @@ def insert():
     password = getpass.getpass("Password: ")
     encrypted_password = hashlib.md5(password).hexdigest()
     autenticado = 0
-    cur.execute("SELECT user_id,username,password FROM login WHERE username = %s",
-                (login,))
+    cur.execute("SELECT user_id,username,password FROM login "
+                "WHERE username = %s",(login,))
     row = cur.fetchone()
     if row != None and login == row[1] and encrypted_password == row[2]:
         user_id =row[0]
