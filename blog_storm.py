@@ -1,9 +1,10 @@
-#TODO terminar o insert(), fazer o listar() e fazer testes
+#first, import python modules
 from datetime import date
 import getpass
 import hashlib
 import sys
 
+#second, import non-python modules, always in alphabetical order
 import psycopg2
 from storm.locals import Int, create_database, Store, Unicode
 from storm.tracer import debug
@@ -27,24 +28,6 @@ class Texto(object):
     id = Int(primary=True)
     post_id = Int()
     conteudo = Unicode()
-
-def schema():
-    
-    store.execute("DROP TABLE IF EXISTS login CASCADE")
-    store.execute("DROP TABLE IF EXISTS post CASCADE")
-    store.execute("DROP TABLE IF EXISTS texto CASCADE")
-
-    store.execute("CREATE TABLE login (id serial PRIMARY KEY,"
-                                       "username VARCHAR UNIQUE,"
-                                       "password VARCHAR)", noresult=True)
-    store.execute("CREATE TABLE post (id serial PRIMARY KEY,"
-                                      "user_id INT References login(id),"
-                                      "header VARCHAR UNIQUE,"
-                                      "day VARCHAR)", noresult=True)
-    store.execute("CREATE TABLE texto (id serial PRIMARY KEY,"
-                                       "post_id INT References post(id),"
-                                       "conteudo TEXT)", noresult=True)
-    store.commit()
 
 def cadastrar():
     person = Person()
@@ -102,7 +85,6 @@ def insert():
     texto.conteudo = text
     texto.post_id = search.id
     store.add(texto)
-    store.flush()
     store.commit()
 
 def listar():
@@ -118,8 +100,24 @@ def listar():
         print row[2].conteudo
         print "============================================================"
 
-
+def schema():
     
+    store.execute("DROP TABLE IF EXISTS login CASCADE")
+    store.execute("DROP TABLE IF EXISTS post CASCADE")
+    store.execute("DROP TABLE IF EXISTS texto CASCADE")
+
+    store.execute("CREATE TABLE login (id serial PRIMARY KEY,"
+                                       "username VARCHAR UNIQUE,"
+                                       "password VARCHAR)", noresult=True)
+    store.execute("CREATE TABLE post (id serial PRIMARY KEY,"
+                                      "user_id INT References login(id),"
+                                      "header VARCHAR UNIQUE,"
+                                      "day VARCHAR)", noresult=True)
+    store.execute("CREATE TABLE texto (id serial PRIMARY KEY,"
+                                       "post_id INT References post(id),"
+                                       "conteudo TEXT)", noresult=True)
+    store.commit()
+
 #print sys.argv, __name__
 if __name__ == '__main__':
     operacao = sys.argv[1]
@@ -133,8 +131,6 @@ if __name__ == '__main__':
         insert()
     elif operacao == '-l':
         listar()
-    elif operacao == '-t':
-        teste()
     elif operacao == '-s':
         schema()
     else:
