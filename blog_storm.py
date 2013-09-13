@@ -49,8 +49,8 @@ def cadastrar():
     store.commit()
 
 def insert():
-    print "=========================Login========================="
     person = Person()
+    print "=============================Login=============================="
     login = unicode(raw_input("Username: "))
     person_search = store.find(Person, username=login).one()
     if person_search is  None:
@@ -65,7 +65,7 @@ def insert():
     user_id = row.id
 
     post = Post()
-    print "==========Insertion mode=========="
+    print "===========================Insertion============================"
     print "Welcome", login
     title = unicode(raw_input("Header: "))
     header_search = store.find(Post, header=title).one()
@@ -88,16 +88,16 @@ def insert():
     store.commit()
 
 def listar():
-    result = store.find((Person, Post, Texto),
+    results = store.find((Person, Post, Texto),
                              (Person.id == Post.user_id),
                              (Post.id == Texto.post_id))
-    for row in result:
+    for result in results:
         print "============================================================"
-        print "Title:", row[1].header
-        print "Opened at:" , row[1].day
-        print "Owner:",row[0].username
+        print "Title:", result[1].header
+        print "Opened at:" , result[1].day
+        print "Owner:",result[0].username
         print "------------------------------------------------------------"
-        print row[2].conteudo
+        print result[2].conteudo
         print "============================================================"
 
 def schema():
