@@ -25,10 +25,10 @@ class HelloWorld:
         self.submit_button.set_tooltip_text("Submit")
         self.submit_button.connect("clicked", self.submit)
         
-        self.user_label = gtk.Label("Username:")
-        self.mail_label = gtk.Label("Email:")
-        self.password_label = gtk.Label("Password:")
-        self.password_check_label = gtk.Label("Re-type password")
+        self.user_label = gtk.Label("Username: ")
+        self.mail_label = gtk.Label("Email: ")
+        self.password_label = gtk.Label("Password: ")
+        self.password_check_label = gtk.Label("Re-type password:")
         self.user_entry = gtk.Entry()
         self.mail_entry = gtk.Entry()
         self.password_entry = gtk.Entry()
@@ -91,6 +91,10 @@ class HelloWorld:
         print self.mail_entry.get_text()
         print self.password_entry.get_text()
         print self.password_check_entry.get_text()
+        if (self.password_entry.get_text() == self.password_check_entry.get_text()):
+            print "igual"
+        else:
+            print "diferente"
         print "submit"
 
 #print __name__
